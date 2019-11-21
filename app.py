@@ -46,13 +46,14 @@ def _is_account_valid(input_email, input_password):
 def index():
     if 'user_id' in session:
         username = session['username']
+        # ユーザIDをキーとして、ユーザが在籍していた学校とその在籍年度を取得する
         query = "MATCH(n:Person{{id:'{}'}})-[rel:belong]->(class)-[in]->(school) RETURN school, rel"
         results = gdb.query(query.format(username),data_contents=True)
         dic = []
         for i in range(len(results)):
             results[i][0]['data'].update(results[i][1]['data'])
             dic.append(results[i][0]['data'])
-            if dic[i]['year'] == 2019:
+            if dic[i]['year'] == 2020:
                 belong_school =dic[i]
         return render_template('index.html',link_name=belong_school['name'],school_id=belong_school['id'],type='school')
     return redirect('/login') # ログイン処理は次のテキストで実装します。
@@ -61,13 +62,14 @@ def index():
 def school(sch_id):
     if 'user_id' in session:
         username = session['username']
+        # ユーザIDと学校IDをキーとして、ユーザが担任または指導していたクラスとその年度を取得する
         query = "MATCH(n:Person{{id:'{}'}})-[rel:belong]->(class)-[:in]->(m:School{{id:'{}'}})RETURN class,rel"
         results = gdb.query(query.format(username,sch_id),data_contents=True)
         dic = []
         for i in range(len(results)):
             results[i][0]['data'].update(results[i][1]['data'])
             dic.append(results[i][0]['data'])
-            if dic[i]['year'] == 2019:
+            if dic[i]['year'] == 2020:
                 belong_class =dic[i]
         return render_template("index2.html", link_name=belong_class['name'],school_id=sch_id, class_id=belong_class['id'],type='classes')
     return redirect('/login')
