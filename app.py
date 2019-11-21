@@ -10,6 +10,8 @@ app = Flask(__name__)
 url = "http://133.16.239.120:7474/db/data/"
 gdb = GraphDatabase(url)
 
+
+
 def conn_f():
     _conn = mysql.connector.connect(host='133.16.239.118',port=3306, user='gui', passwd='test', db='sample_app', charset='utf8')
     return _conn
