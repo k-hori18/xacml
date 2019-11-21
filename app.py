@@ -41,6 +41,7 @@ def _is_account_valid(input_email, input_password):
         print("エラーです")
         return False
 
+
 # 登録後のページの表示
 @app.route('/')
 def index():
@@ -58,6 +59,7 @@ def index():
         return render_template('index.html',link_name=belong_school['name'],school_id=belong_school['id'],type='school')
     return redirect('/login') # ログイン処理は次のテキストで実装します。
 
+
 @app.route('/<sch_id>')
 def school(sch_id):
     if 'user_id' in session:
@@ -71,12 +73,21 @@ def school(sch_id):
             dic.append(results[i][0]['data'])
             if dic[i]['year'] == 2020:
                 belong_class =dic[i]
-        return render_template("index2.html", link_name=belong_class['name'],school_id=sch_id, class_id=belong_class['id'],type='classes')
+        return render_template("index2.html", link_name=belong_class['name'],school_id=sch_id, class_id=belong_class['id'],year=belong_class['year'],type='classes')
     return redirect('/login')
 
-@app.route('/<sch_id>/<cls_id>')
-def classes(sch_id,cls_id):
-    return render_template('hello_world.html', link_id=cls_id)
+
+@app.route('/<sch_id>/<cls_id>/<bel_year>')
+def classes(sch_id,cls_id,bel_year):
+    if 'user_id' in session:
+        query = "MATCH (n:Student)-[:belong{{year:{}}}]->(:Class{{id:'{}'}}) RETURN n;"
+        results = gdb.query(query.format(bel_year,cls_id),data_contents=True)
+        print(len(results))
+        dic = []
+        for i in range(len(results)):
+            dic.append(results[i][0]['data'])
+        return render_template('hello_world.html', link_id=dic[0]['id'])
+    return redirect('/login')
 
 
 @app.route('/sign_up', methods=['GET', 'POST'])
