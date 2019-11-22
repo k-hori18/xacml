@@ -73,7 +73,7 @@ def school(sch_id):
             dic.append(results[i][0]['data'])
             if dic[i]['year'] == 2020:
                 belong_class =dic[i]
-        return render_template("index2.html", link_name=belong_class['name'],school_id=sch_id, class_id=belong_class['id'],year=belong_class['year'],type='classes')
+        return render_template("index2.html",link_name=belong_class['name'],school_id=sch_id, class_id=belong_class['id'],year=belong_class['year'],type='classes')
     return redirect('/login')
 
 
@@ -82,11 +82,17 @@ def classes(sch_id,cls_id,bel_year):
     if 'user_id' in session:
         query = "MATCH (n:Student)-[:belong{{year:{}}}]->(:Class{{id:'{}'}}) RETURN n;"
         results = gdb.query(query.format(bel_year,cls_id),data_contents=True)
-        print(len(results))
         dic = []
-        for i in range(len(results)):
-            dic.append(results[i][0]['data'])
-        return render_template('hello_world.html', link_id=dic[0]['id'])
+        for i in results:
+            dic.append(i[0]['data'])
+        return render_template('index3.html',list=dic,school_id=sch_id,class_id=cls_id,year=bel_year,type='students')
+    return redirect('/login')
+
+
+@app.route('/<sch_id>/<cls_id>/<bel_year>/<std_id>/')
+def students(sch_id,cls_id,bel_year,std_id):
+    if 'user_id' in session:
+        return render_template('hello_world.html',link_id=std_id)
     return redirect('/login')
 
 
