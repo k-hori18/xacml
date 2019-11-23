@@ -93,7 +93,9 @@ def classes(sch_id,cls_id,bel_year):
 @app.route('/<sch_id>/<cls_id>/<bel_year>/<std_id>/')
 def students(sch_id,cls_id,bel_year,std_id):
     if 'user_id' in session:
-        return render_template('hello_world.html',link_id=std_id)
+        if pep._confirm_server_alive(std_id):
+            return render_template('hello_world.html',message='success')
+        return render_template('hello_world.html',message='failed')
     return redirect('/login')
 
 
