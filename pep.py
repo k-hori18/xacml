@@ -46,5 +46,26 @@ def _confirm_server_alive(student_id):
     password = 'test'
     url = 'http://{}/webdav/davtest/test.txt'
     
-    req = requests.get(url.format(server), auth=(user,password))
-    return req.status_code == 200
+    try:
+        req = requests.get(url.format(server), auth=(user,password))
+        with open(_GLOBAL_PATH + '/test.txt', mode='w') as f:
+            f.write(req.text)
+        return req.status_code == 200
+    except requests.exceptions.ConnectionError:
+        return False
+
+
+def _download_file(student_id, file_id):
+    server = _get_server_address(student_id)
+    user = 'davtest'
+    password = 'test'
+    url = 'http://{}/webdav/davtest/' + file_id
+
+    try:
+        req = requests.get(url.format(server), auth=(user,password))
+        with open(_GLOBAL_PATH + '/' + file_id, mode='w') as f:
+            f.write(req.text)
+        return _GLOBAL_PATH + '/' + file_id
+    except requests.exceptions.ConnectionError:
+        return False
+    return 0

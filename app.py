@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, send_file, render_template, request, session, redirect
 import mysql.connector
 #from werkzeug import secure_filename
 from werkzeug.security import generate_password_hash
@@ -10,7 +10,6 @@ import pep
 app = Flask(__name__)
 url = "http://133.16.239.120:7474/db/data/"
 gdb = GraphDatabase(url)
-
 
 
 def conn_f():
@@ -94,8 +93,21 @@ def classes(sch_id,cls_id,bel_year):
 def students(sch_id,cls_id,bel_year,std_id):
     if 'user_id' in session:
         if pep._confirm_server_alive(std_id):
-            return render_template('hello_world.html',message='success')
+            query = "MATCH (:Student{{id:'{}'}})-[:have]->(n:File{{year:{}}}) RETURN n;"
+            results = gdb.query(query.format(std_id,bel_year),data_contents=True)
+            dic = []
+            for i in results:
+                dic.append(i[0]['data'])
+            return render_template('index4.html',list=dic,student_id=std_id,type='view_datalist')
         return render_template('hello_world.html',message='failed')
+    return redirect('/login')
+
+
+@app.route('/view/<std_id>/<fl_id>')
+def view_datalist(std_id,fl_id):
+    if 'user_id' in session:
+        file_path = pep._download_file(std_id,fl_id)
+        return send_file(file_path, as_attachment=True, attachment_filename=fl_id)
     return redirect('/login')
 
 

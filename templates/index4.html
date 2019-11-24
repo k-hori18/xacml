@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>マイページ</title>
+</head>
+<body>
+<h1>マイページ</h1>
+{% for i in list %}
+<a href="{{ url_for(type,std_id=student_id,fl_id=i['id']) }}">{{ i['name'] }}<br></a>
+{% endfor %}
+<br>
+<a href="/logout">ログアウト</a>
+</body>
+</html>
